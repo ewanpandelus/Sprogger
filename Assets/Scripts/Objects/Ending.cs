@@ -28,24 +28,17 @@ public class Ending : MonoBehaviour
         endPads = GameObject.FindGameObjectsWithTag("EndPad");
         if (endPads!=null)
         {
-            ResetEndLilyPads();
+            SetupEndLilyPads();
         }
     }
-    private void ResetEndLilyPadsBool()
+    private void SetupEndLilyPads()
     {
         foreach(GameObject endPad in endPads)
         {
             endLilys[endPad.transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).gameObject] = false;
         }
     }
-    public void ResetEndLilyPads()
-    {
-        foreach(KeyValuePair<GameObject,bool> lilyPad in endLilys)
-        {
-            lilyPad.Key.transform.parent.transform.parent.gameObject.SetActive(true);
-        }
-        ResetEndLilyPadsBool();
-    }
+
     public void UpdateEndPad(GameObject endPad)
     {
         endLilys[endPad] = true;

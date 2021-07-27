@@ -44,7 +44,7 @@ public class FadePanel : MonoBehaviour
             LeanTween.value(gameObject, minAlpha, maxAlpha, _time).setOnUpdate((float _alpha) =>
             {
                 panel.color = new Color(0, 0, 0, _alpha);
-            }).setEase(LeanTweenType.easeInCubic).setOnComplete(QuitApplication);
+            }).setEase(LeanTweenType.easeInCubic);
             isBlack = true;
         }
     }

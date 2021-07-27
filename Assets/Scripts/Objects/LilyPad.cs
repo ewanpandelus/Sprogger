@@ -8,55 +8,77 @@ public class LilyPad : MonoBehaviour
     private ConstantRotation parentRotater;
     private CheckpointReset checkPointReset;
     private Checkpoint checkPoint;
-    
-
-    Vector3 lillipadScale;
+    private Vector3 lilyPadScale;
+    [SerializeField]
+    private Material endMaterial = null;
+    private Renderer rend;
 
     private void Start()
     {
         parentRotater = gameObject.GetComponentInParent<ConstantRotation>();
         checkPointReset = GameObject.Find("CheckpointReset").GetComponent<CheckpointReset>();
         checkPoint = gameObject.transform.parent.transform.parent.transform.parent.GetComponent<Checkpoint>();
-        lillipadScale = transform.localScale;
+        lilyPadScale = transform.localScale;
+        rend = GetComponent<MeshRenderer>();
     }
     private void OnTriggerEnter(Collider other)
     {
         if(other.name == "Player")
         {
             playerController = other.gameObject.GetComponent<Controller>();
-            if (playerController)
+            bool isPlayerUnderneath = CalcIfUnderneath();
+            if (playerController&&!isPlayerUnderneath)
             {
-                playerController.gameObject.AddComponent<ConstantRotation>();
                 playerController.Stick(this, parentRotater.GetRotationRate());
                 if (checkPoint)
                 {
                     checkPoint.UpdateCheckpoint();
                 }
             }
+            else
+            {
+                checkPointReset.AddGameObjectsToReset(gameObject.transform.parent.transform.parent.gameObject);
+            }
+   
         } 
     }
-
+    private bool CalcIfUnderneath()
+    {
+        if ((playerController.transform.position.y+playerController.GetComponent<CapsuleCollider>().radius/2) - this.transform.position.y < 0)
+        {
+            ScaleDown();
+            return true;
+        }
+        return false;
+    }
     private void OnTriggerExit(Collider other)
     {
-        if(other.name == "Player")
+        if (other.name == "Player")
         {
             playerController.UnSitck(this);
+            if (gameObject.transform.parent.transform.parent.transform.parent.tag == "EndPad")
+            {
+                EndLily();
+                return;
+            }
+        
             checkPointReset.AddGameObjectsToReset(gameObject.transform.parent.transform.parent.gameObject);
             ScaleDown();
-            if(gameObject.transform.parent.transform.parent.transform.parent.tag == "EndPad")
-            {
-                Ending.Instance.UpdateEndPad(gameObject);
-            }
-      
-
         }
     }
-
+    private void EndLily()
+    {
+        Ending.Instance.UpdateEndPad(gameObject);
+        if (endMaterial)
+        {
+            rend.material.Lerp(GetComponent<MeshRenderer>().material, endMaterial,2f);
+        }
+    }
     private void KillLilyPad()
     {
 
         gameObject.transform.parent.transform.parent.gameObject.SetActive(false);
-        transform.localScale = lillipadScale;
+        transform.localScale = lilyPadScale;
     }
 
     private void ScaleDown()

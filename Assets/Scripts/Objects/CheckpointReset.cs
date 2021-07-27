@@ -59,7 +59,6 @@ public class CheckpointReset : MonoBehaviour
         CalculateCheckPointGameObjects();
         ActivateLilyPads();
         ResetPlayer();
-        Ending.Instance.ResetEndLilyPads();
     }
     private void ResetPlayer()
     {

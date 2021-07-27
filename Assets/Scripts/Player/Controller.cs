@@ -7,12 +7,12 @@ public class Controller : MonoBehaviour
     [SerializeField]
     private float force = 0f;
     [SerializeField]
-    private float speed = 300f;
+    private float speed = 900f;
     [SerializeField]
     private float maxForce;
     private float lastLeapForce;
     private bool onGround = true;
-    private Quaternion startingRotation;
+    private bool fadingOut = false;
     private bool gameStarted = false;
     private PowerBar powerBar;
     private PlayerSounds playerSounds;
@@ -27,7 +27,6 @@ public class Controller : MonoBehaviour
         parentPlayerRotation = transform.parent.GetComponent<ParentPlayerRotation>();
         checkPointReset = GameObject.Find("CheckpointReset").GetComponent<CheckpointReset>();
         playerSounds = GetComponent<PlayerSounds>();
-        startingRotation = transform.rotation;
     }
     private void Update()
     {
@@ -42,6 +41,7 @@ public class Controller : MonoBehaviour
         }
         else
         {
+
             if (transform.position.y <= -1.5 && !fadingOut)
             {
                     //Respawn function is controlled by fadeout script. (Respawn after faded out) 
@@ -60,9 +60,14 @@ public class Controller : MonoBehaviour
             Application.Quit();
         }
     }
+  
+    private Vector3 MovementInput()
+    {
+        float x = Input.GetAxisRaw("Horizontal");
+        float y = Input.GetAxisRaw("Vertical");
+        return transform.right * x + transform.forward * y;
+    }
 
-        //bool ensures the fade out script can only run once 
-    bool fadingOut = false;
     private void FadeOut(float time)
     {
         FadePanel.Instance.FadeOut(time);
@@ -82,12 +87,7 @@ public class Controller : MonoBehaviour
 
     private void GroundedMovement()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
-        Vector3 moveDirection = transform.right * x + transform.forward * y;
-        Vector3 moveForce = moveDirection * speed;
-        
-
+        Vector3 moveForce = MovementInput() * speed;
         rb.AddForce(moveForce * Time.deltaTime, ForceMode.Acceleration) ;
     }
     private void JumpingMovement()
